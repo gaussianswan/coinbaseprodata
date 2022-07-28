@@ -35,7 +35,7 @@ def load_db_keys() -> namedtuple:
     Returns:
         namedtuple: Named tuple holding all the postgres credentials for AWS from your environment
     """
-
+    load_dotenv()
     dbcredentials = namedtuple('DBCredentials', field_names=['username', 'password', 'host', 'database', 'port'])
     host = os.environ['DB_HOST']
     password = os.environ['DB_PASSWORD']
@@ -46,3 +46,16 @@ def load_db_keys() -> namedtuple:
     credentials = dbcredentials(username, password, host, database, port)
 
     return credentials
+
+def load_aws_keys() -> namedtuple:
+
+    awskeys = namedtuple("AWSKeys", field_names = ['access_key_id', 'secret_access_key'])
+    load_dotenv()
+
+    access_key_id = os.environ['AWS_ACCESS_KEYID']
+    secret_access_key = os.environ['AWS_SECRET_ACCESSKEY']
+
+    keys = awskeys(access_key_id, secret_access_key)
+    return keys
+
+
