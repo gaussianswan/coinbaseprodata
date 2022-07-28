@@ -28,7 +28,7 @@ class S3:
             to_filename (str): Filename to save this to
         """
 
-        self._client.download_file(
+        self.client.download_file(
             Bucket = bucket_name,
             Key = from_filename,
             Filename = to_filename
@@ -43,7 +43,7 @@ class S3:
             to_filename (str): Filename for the new file in the bucket
         """
 
-        self._client.upload_file(
+        self.client.upload_file(
             Bucket = bucket_name,
             Filename = from_filename,
             Key = to_filename
@@ -56,9 +56,8 @@ class S3:
             new_bucket_name (str): _description_
         """
 
-        self._client.create_bucket(
-            Bucket = new_bucket_name,
-            CreateBucketConfiguration = self.location
+        self.client.create_bucket(
+            Bucket = new_bucket_name
         )
 
     def get_key_list_from_bucket(self, bucket_name: str):
