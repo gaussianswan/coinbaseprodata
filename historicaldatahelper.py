@@ -12,7 +12,10 @@ class CBProHistDataRetriever:
 
     def get_historical_prices(self, product: str, start_date: pd.Timestamp, end_date: pd.Timestamp, granularity: int)-> pd.DataFrame:
         offset = DateOffset(seconds = self.candles_per_request * granularity)
-        date_range = pd.date_range(start=start_date, end=end_date, freq=offset)
+        date_range = list(pd.date_range(start=start_date, end=end_date, freq=offset))
+
+        if end_date not in date_range:
+            date_range.append(end_date)
         date_range_iso = []
         for date in date_range:
             date_range_iso.append(date.isoformat())
