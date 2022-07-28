@@ -1,12 +1,10 @@
 from load_keys import load_aws_keys, load_db_keys
-from s3helper import S3
 from postgresconnector import PostgresConnection
 from historicaldatahelper import CBProHistDataRetriever
 
 import pandas as pd
 import datetime
 
-awskeys = load_aws_keys()
 dbkeys = load_db_keys()
 
 connection = PostgresConnection(*dbkeys)
