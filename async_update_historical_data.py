@@ -1,17 +1,16 @@
 import aiohttp
 import asyncio
 import pandas as pd
-import nest_asyncio
 import datetime
 
 from datafuncs import process_cbpro_hist_data
 from functools import reduce
 from postgresconnector import PostgresConnection
 from load_keys import load_db_keys
+from aiolimiter import AsyncLimiter
 
 dbkeys = load_db_keys()
 connection = PostgresConnection(*dbkeys)
-nest_asyncio.apply()
 
 num_candles = 300
 
@@ -35,8 +34,8 @@ for i in range(len(date_isoformat)-1):
     url = f'https://api.exchange.coinbase.com/products/{product}/candles?start={date_isoformat[i]}&end={date_isoformat[i+1]}&granularity={granularity}'
     urls.append(url)
 
-async def dataworker(semaphore: asyncio.Semaphore, request_url: str):
-    async with semaphore:
+async def dataworker(limiter: AsyncLimiter, request_url: str):
+    async with limiter:
         async with aiohttp.ClientSession() as session:
             async with session.request(method = 'GET', url = request_url) as response:
                 data = await response.json()
@@ -44,11 +43,11 @@ async def dataworker(semaphore: asyncio.Semaphore, request_url: str):
     return data
 
 async def main(urls):
-    limit = asyncio.Semaphore(10)
+    limiter = AsyncLimiter(10, 1) # We can only make 10 requests per second
 
     tasks = []
     for url in urls:
-        tasks.append(dataworker(limit, url))
+        tasks.append(dataworker(limiter, url))
 
     results = await asyncio.gather(*tasks)
     return results
